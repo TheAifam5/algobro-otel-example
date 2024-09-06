@@ -1,0 +1,31 @@
+services:
+  algobro:
+    build: algobro
+    environment:
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-lgtm:4317/
+      - OTEL_RESOURCE_ATTRIBUTES=service.name=algobro
+    networks:
+      - cerebro
+    depends_on:
+      - otel-lgtm
+  otel-lgtm:
+    image: grafana/otel-lgtm
+    volumes:
+      - grafana:/data/grafana
+      - prometheus:/data/prometheus
+      - loki:/loki
+    ports:
+      - 3000:3000
+      - 4317:4317
+      - 4318:4318
+    environment:
+      - GF_PATHS_DATA=/data/grafana
+    networks:
+      - cerebro
+volumes:
+  grafana:
+  loki:
+  prometheus:
+networks:
+  cerebro:
